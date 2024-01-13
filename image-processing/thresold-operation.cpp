@@ -63,7 +63,8 @@ void Perspective()
 void Threshold()
 {
     cvtColor(framePers, frameGray, COLOR_RGB2GRAY);
-    inRange(frameGray, 200, 255, frameThresh);
+    inRange(frameGray, 100, 110, frameThresh);
+    // input image, minm thresold white, maxm thresold for white , output image
 }
 
 int main(int argc, char **argv)

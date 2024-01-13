@@ -60,6 +60,12 @@ void Perspective()
     warpPerspective(frame, framePers, Matrix, Size(400, 240));
 }
 
+void Threshold()
+{
+    cvtColor(framePers, frameGray, COLOR_RGB2GRAY);
+    inRange(frameGray, 200, 255, frameThresh);
+}
+
 int main(int argc, char **argv)
 {
 
@@ -79,6 +85,7 @@ int main(int argc, char **argv)
 
         Capture();
         Perspective();
+        Threshold();
 
         namedWindow("orignal", WINDOW_KEEPRATIO);
         moveWindow("orignal", 0, 100);
@@ -89,6 +96,11 @@ int main(int argc, char **argv)
         moveWindow("Perspective", 640, 100);
         resizeWindow("Perspective", 640, 480);
         imshow("Perspective", framePers);
+
+        namedWindow("Final", WINDOW_KEEPRATIO);
+        moveWindow("Final", 1280, 100);
+        resizeWindow("Final", 640, 480);
+        imshow("Final", frameFinal);
 
         waitKey(1);
         auto end = std::chrono::system_clock::now();

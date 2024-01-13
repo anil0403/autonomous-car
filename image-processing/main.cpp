@@ -9,17 +9,18 @@ using namespace std;
 using namespace cv;
 using namespace raspicam;
 
-Mat frame, Matrix, framePers, frameGray, frameThresh, frameEdge, frameFinal, frameFinalDuplicate;
-Mat ROILane;
-int LeftLanePos, RightLanePos, frameCenter, laneCenter, Result;
+Mat frame, Matrix, framePers, frameGray, frameThresh, frameEdge, frameFinal, frameFinalDuplicate, frameFinalDuplicate1;
+Mat ROILane, ROILaneEnd;
+int LeftLanePos, RightLanePos, frameCenter, laneCenter, Result, laneEnd;
 
 RaspiCam_Cv Camera;
 
 stringstream ss;
 
 vector<int> histrogramLane;
+vector<int> histrogramLaneEnd;
 
-Point2f Source[] = {Point2f(40, 145), Point2f(360, 145), Point2f(10, 195), Point2f(390, 195)};
+Point2f Source[] = {Point2f(40, 135), Point2f(360, 135), Point2f(0, 185), Point2f(400, 185)};
 Point2f Destination[] = {Point2f(100, 0), Point2f(280, 0), Point2f(100, 240), Point2f(280, 240)};
 
 void Setup(int argc, char **argv, RaspiCam_Cv &Camera)
@@ -30,7 +31,7 @@ void Setup(int argc, char **argv, RaspiCam_Cv &Camera)
     Camera.set(CAP_PROP_CONTRAST, ("-co", argc, argv, 50));
     Camera.set(CAP_PROP_SATURATION, ("-sa", argc, argv, 50));
     Camera.set(CAP_PROP_GAIN, ("-g", argc, argv, 50));
-    Camera.set(CAP_PROP_FPS, ("-fps", argc, argv, 100));
+    Camera.set(CAP_PROP_FPS, ("-fps", argc, argv, 0));
 }
 
 void Capture()
@@ -54,11 +55,12 @@ void Perspective()
 void Threshold()
 {
     cvtColor(framePers, frameGray, COLOR_RGB2GRAY);
-    inRange(frameGray, 200, 255, frameThresh);
+    inRange(frameGray, 230, 255, frameThresh);
     Canny(frameGray, frameEdge, 900, 900, 3, false);
     add(frameThresh, frameEdge, frameFinal);
     cvtColor(frameFinal, frameFinal, COLOR_GRAY2RGB);
-    cvtColor(frameFinal, frameFinalDuplicate, COLOR_RGB2BGR); // used in histrogram function only
+    cvtColor(frameFinal, frameFinalDuplicate, COLOR_RGB2BGR);  // used in histrogram function only
+    cvtColor(frameFinal, frameFinalDuplicate1, COLOR_RGB2BGR); // used in histrogram function only
 }
 
 void Histrogram()
@@ -72,6 +74,17 @@ void Histrogram()
         divide(255, ROILane, ROILane);
         histrogramLane.push_back((int)(sum(ROILane)[0]));
     }
+
+    histrogramLaneEnd.resize(400);
+    histrogramLaneEnd.clear();
+    for (int i = 0; i < 400; i++)
+    {
+        ROILaneEnd = frameFinalDuplicate1(Rect(i, 0, 1, 240));
+        divide(255, ROILaneEnd, ROILaneEnd);
+        histrogramLaneEnd.push_back((int)(sum(ROILaneEnd)[0]));
+    }
+    laneEnd = sum(histrogramLaneEnd)[0];
+    cout << "Lane END = " << laneEnd << endl;
 }
 
 void LaneFinder()
@@ -129,6 +142,15 @@ int main(int argc, char **argv)
         Histrogram();
         LaneFinder();
         LaneCenter();
+
+        if (laneEnd > 3000)
+        {
+            digitalWrite(21, 1);
+            digitalWrite(22, 1); // decimal = 7
+            digitalWrite(23, 1);
+            digitalWrite(24, 0);
+            cout << "Lane End" << endl;
+        }
 
         if (Result == 0)
         {
@@ -193,10 +215,37 @@ int main(int argc, char **argv)
             cout << "Left3" << endl;
         }
 
-        ss.str(" ");
-        ss.clear();
-        ss << "Result = " << Result;
-        putText(frame, ss.str(), Point2f(1, 50), 0, 1, Scalar(0, 0, 255), 2);
+        if (laneEnd > 3000)
+        {
+            ss.str(" ");
+            ss.clear();
+            ss << " Lane End";
+            putText(frame, ss.str(), Point2f(1, 50), 0, 1, Scalar(255, 0, 0), 2);
+        }
+
+        else if (Result == 0)
+        {
+            ss.str(" ");
+            ss.clear();
+            ss << "Result = " << Result << " Move Forward";
+            putText(frame, ss.str(), Point2f(1, 50), 0, 1, Scalar(0, 0, 255), 2);
+        }
+
+        else if (Result > 0)
+        {
+            ss.str(" ");
+            ss.clear();
+            ss << "Result = " << Result << "bMove Right";
+            putText(frame, ss.str(), Point2f(1, 50), 0, 1, Scalar(0, 0, 255), 2);
+        }
+
+        else if (Result < 0)
+        {
+            ss.str(" ");
+            ss.clear();
+            ss << "Result = " << Result << " Move Left";
+            putText(frame, ss.str(), Point2f(1, 50), 0, 1, Scalar(0, 0, 255), 2);
+        }
 
         namedWindow("orignal", WINDOW_KEEPRATIO);
         moveWindow("orignal", 0, 100);
@@ -219,7 +268,7 @@ int main(int argc, char **argv)
 
         float t = elapsed_seconds.count();
         int FPS = 1 / t;
-        cout << "FPS = " << FPS << endl;
+        // cout<<"FPS = "<<FPS<<endl;
     }
 
     return 0;

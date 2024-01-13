@@ -97,10 +97,10 @@ int main(int argc, char **argv)
         resizeWindow("Perspective", 640, 480);
         imshow("Perspective", framePers);
 
-        namedWindow("Final", WINDOW_KEEPRATIO);
-        moveWindow("Final", 1280, 100);
-        resizeWindow("Final", 640, 480);
-        imshow("Final", frameFinal);
+        namedWindow("Thresold", WINDOW_KEEPRATIO);
+        moveWindow("Thresold", 1280, 100);
+        resizeWindow("Thresold", 640, 480);
+        imshow("Thresold", frameThresh);
 
         waitKey(1);
         auto end = std::chrono::system_clock::now();

@@ -20,7 +20,7 @@ vector<int> histrogramLane;
 
 // data type of points in px values
 Point2f Source[] = {Point2f(40, 160), Point2f(345, 160), Point2f(1, 205), Point2f(380, 205)};
-Point2f Destination[] = {Point2f(100, 0), Point2f(280, 0), Point2f(1, 205), Point2f(380, 205)};
+Point2f Destination[] = {Point2f(60, 0), Point2f(310, 0), Point2f(60, 240), Point2f(310, 240)};
 
 void Setup(int argc, char **argv, RaspiCam_Cv &Camera)
 {
@@ -55,6 +55,9 @@ void Perspective()
     line(frame, Destination[1], Destination[3], Scalar(0, 255, 0), 2);
     line(frame, Destination[3], Destination[2], Scalar(0, 255, 0), 2);
     line(frame, Destination[2], Destination[0], Scalar(0, 255, 0), 2);
+    
+        Matrix = getPerspectiveTransform(Source, Destination);
+    warpPerspective(frame, framePers, Matrix, Size(400, 240));
 }
 
 int main(int argc, char **argv)
@@ -81,8 +84,13 @@ int main(int argc, char **argv)
         moveWindow("orignal", 0, 100);
         resizeWindow("orignal", 640, 480);
         imshow("orignal", frame);
+        
+                namedWindow("Perspective", WINDOW_KEEPRATIO);
+        moveWindow("Perspective", 640, 100);
+        resizeWindow("Perspective", 640, 480);
+        imshow("Perspective", framePers);
 
-        waitKey(0);
+        waitKey(1);
         auto end = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed_seconds = end - start;
 

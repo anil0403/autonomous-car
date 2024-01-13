@@ -19,18 +19,18 @@ stringstream ss;
 vector<int> histrogramLane;
 
 // data type of points in px values
-Point2f Source[] = {Point2f(40, 145), Point2f(360, 145), Point2f(10, 195), Point2f(390, 195)};
-Point2f Destination[] = {Point2f(100, 0), Point2f(280, 0), Point2f(100, 240), Point2f(280, 240)};
+Point2f Source[] = {Point2f(40, 160), Point2f(345, 160), Point2f(1, 205), Point2f(380,205)};
+Point2f Destination[] = {Point2f(100, 0), Point2f(280, 0), Point2f(100, 240), Point2f(27, 240)};
 
 void Setup(int argc, char **argv, RaspiCam_Cv &Camera)
 {
-    Camera.set(CAP_PROP_FRAME_WIDTH, ("-w", argc, argv, 400));
-    Camera.set(CAP_PROP_FRAME_HEIGHT, ("-h", argc, argv, 240));
-    Camera.set(CAP_PROP_BRIGHTNESS, ("-br", argc, argv, 50));
-    Camera.set(CAP_PROP_CONTRAST, ("-co", argc, argv, 50));
-    Camera.set(CAP_PROP_SATURATION, ("-sa", argc, argv, 50));
-    Camera.set(CAP_PROP_GAIN, ("-g", argc, argv, 50));
-    Camera.set(CAP_PROP_FPS, ("-fps", argc, argv, 100));
+  Camera.set(CAP_PROP_FRAME_WIDTH, ("-w", argc, argv, 400));
+  Camera.set(CAP_PROP_FRAME_HEIGHT, ("-h", argc, argv, 240));
+  Camera.set(CAP_PROP_BRIGHTNESS, ("-br", argc, argv, 70));
+  Camera.set(CAP_PROP_CONTRAST, ("-co", argc, argv, 60));
+  Camera.set(CAP_PROP_SATURATION, ("-sa", argc, argv, 60));
+  Camera.set(CAP_PROP_GAIN, ("-g", argc, argv, 50));
+  Camera.set(CAP_PROP_FPS, ("-fps", argc, argv, 100));
 }
 
 void Capture()
@@ -77,7 +77,7 @@ int main(int argc, char **argv)
         resizeWindow("orignal", 640, 480);
         imshow("orignal", frame);
 
-        waitKey(1);
+        waitKey(0);
         auto end = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed_seconds = end - start;
 

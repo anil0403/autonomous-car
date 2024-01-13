@@ -1,8 +1,7 @@
 #include <opencv2/opencv.hpp>
 #include <raspicam_cv.h>
 #include <iostream>
-#include <chrono>
-#include <ctime>
+
 
 using namespace std;
 using namespace cv;
@@ -41,7 +40,7 @@ int main(int argc, char **argv)
 
   Camera.grab();
   Camera.retrieve(frame);
-  imshow("Frame", frame);
+  imshow("camera frame", frame);
   waitKey(1);
 
   return 0;

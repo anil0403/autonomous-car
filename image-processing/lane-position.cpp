@@ -88,8 +88,8 @@ void LaneFinder()
     RightPtr = max_element(histrogramLane.begin() +250, histrogramLane.end());
     RightLanePos = distance(histrogramLane.begin(), RightPtr);
     
-    line(frameFinal, Point2f(LeftLanePos, 0), Point2f(LeftLanePos, 240), Scalar(0, 255,0), 2);
-    line(frameFinal, Point2f(RightLanePos, 0), Point2f(RightLanePos, 240), Scalar(0,255,0), 2); 
+    line(frameFinal, Point2f(LeftLanePos, 0), Point2f(LeftLanePos, 240), Scalar(0, 255,0), 2); // left lane  postion 
+    line(frameFinal, Point2f(RightLanePos, 0), Point2f(RightLanePos, 240), Scalar(0,255,0), 2);  // right lane position
 }
 
 void LaneCenter()
@@ -97,8 +97,8 @@ void LaneCenter()
     laneCenter = (RightLanePos-LeftLanePos)/2 +LeftLanePos;
     frameCenter = 188;
     
-    line(frameFinal, Point2f(laneCenter,0), Point2f(laneCenter,240), Scalar(0,255,0), 3);
-    line(frameFinal, Point2f(frameCenter,0), Point2f(frameCenter,240), Scalar(255,0,0), 3);
+    line(frameFinal, Point2f(laneCenter,0), Point2f(laneCenter,240), Scalar(0,255,0), 3); // lane center green
+    line(frameFinal, Point2f(frameCenter,0), Point2f(frameCenter,240), Scalar(255,0,0), 3); // frame center blue
 
     Result = laneCenter-frameCenter;
 }

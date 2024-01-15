@@ -58,7 +58,7 @@ void Threshold()
     cvtColor(framePers, frameGray, COLOR_RGB2GRAY);
     inRange(frameGray, 195, 255, frameThresh);
     // input image, minm thresold white, maxm thresold for white , output image
-    Canny(frameGray, frameEdge, 300, 500, 3, false);
+    Canny(frameGray, frameEdge, 100, 500, 3, false);
     add(frameThresh, frameEdge, frameFinal);
     cvtColor(frameFinal, frameFinal, COLOR_GRAY2RGB);
     cvtColor(frameFinal, frameFinalDuplicate, COLOR_RGB2BGR);  // used in histrogram function only
@@ -70,21 +70,31 @@ void Histrogram()
     histrogramLane.resize(300);
     histrogramLane.clear();
 
-    for (int i = 0; i < 300; i++) // frame.size().width = 300
+    for (int i = 0; i < 300; i++)
     {
-        ROILane = frameFinalDuplicate(Rect(i, 140, 1, 100));
-        divide(255, ROILane, ROILane);
-        histrogramLane.push_back((int)(sum(ROILane)[0]));
+        // Ensure that the ROI dimensions are valid
+        if (i + 1 <= frameFinalDuplicate.cols)
+        {
+            ROILane = frameFinalDuplicate(Rect(i, 140, 1, 60));  // Adjusted the height to 60
+            divide(255, ROILane, ROILane);
+            histrogramLane.push_back((int)(sum(ROILane)[0]));
+        }
     }
 
     histrogramLaneEnd.resize(300);
     histrogramLaneEnd.clear();
+
     for (int i = 0; i < 300; i++)
     {
-        ROILaneEnd = frameFinalDuplicate1(Rect(i, 0, 1, 200));
-        divide(255, ROILaneEnd, ROILaneEnd);
-        histrogramLaneEnd.push_back((int)(sum(ROILaneEnd)[0]));
+        // Ensure that the ROI dimensions are valid
+        if (i + 1 <= frameFinalDuplicate1.cols)
+        {
+            ROILaneEnd = frameFinalDuplicate1(Rect(i, 0, 1, 60));
+            divide(255, ROILaneEnd, ROILaneEnd);
+            histrogramLaneEnd.push_back((int)(sum(ROILaneEnd)[0]));
+        }
     }
+
     laneEnd = sum(histrogramLaneEnd)[0];
     cout << "Lane END = " << laneEnd << endl;
 }

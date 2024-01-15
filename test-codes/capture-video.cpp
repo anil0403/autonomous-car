@@ -7,11 +7,13 @@ using namespace cv;
 using namespace raspicam;
 
 Mat frame;
+int width = 300;
+int height = 200;
 
 void Setup(int argc, char **argv, RaspiCam_Cv &Camera)
 {
-  Camera.set(CAP_PROP_FRAME_WIDTH, ("-w", argc, argv, 1080));
-  Camera.set(CAP_PROP_FRAME_HEIGHT, ("-h", argc, argv, 720));
+  Camera.set(CAP_PROP_FRAME_WIDTH, ("-w", argc, argv, width));
+  Camera.set(CAP_PROP_FRAME_HEIGHT, ("-h", argc, argv, height));
   Camera.set(CAP_PROP_BRIGHTNESS, ("-br", argc, argv, 70));
   Camera.set(CAP_PROP_CONTRAST, ("-co", argc, argv, 60));
   Camera.set(CAP_PROP_SATURATION, ("-sa", argc, argv, 60));

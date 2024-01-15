@@ -19,18 +19,18 @@ stringstream ss;
 vector<int> histrogramLane;
 
 // data type of points in px values
-Point2f Source[] = {Point2f(40, 160), Point2f(345, 160), Point2f(1, 205), Point2f(380, 205)};
-Point2f Destination[] = {Point2f(60, 0), Point2f(310, 0), Point2f(60, 240), Point2f(310, 240)};
+Point2f Source[] = {Point2f(50, 135), Point2f(253, 135), Point2f(10, 185), Point2f(291, 185)};
+Point2f Destination[] = {Point2f(75,0), Point2f(230, 0), Point2f(75,240), Point2f(230, 240)};
 
 void Setup(int argc, char **argv, RaspiCam_Cv &Camera)
 {
-    Camera.set(CAP_PROP_FRAME_WIDTH, ("-w", argc, argv, 400));
-    Camera.set(CAP_PROP_FRAME_HEIGHT, ("-h", argc, argv, 240));
-    Camera.set(CAP_PROP_BRIGHTNESS, ("-br", argc, argv, 70));
-    Camera.set(CAP_PROP_CONTRAST, ("-co", argc, argv, 60));
+    Camera.set(CAP_PROP_FRAME_WIDTH, ("-w", argc, argv,300));
+    Camera.set(CAP_PROP_FRAME_HEIGHT, ("-h", argc, argv, 200));
+    Camera.set(CAP_PROP_BRIGHTNESS, ("-br", argc, argv, 50));
+    Camera.set(CAP_PROP_CONTRAST, ("-co", argc, argv, 50));
     Camera.set(CAP_PROP_SATURATION, ("-sa", argc, argv, 60));
     Camera.set(CAP_PROP_GAIN, ("-g", argc, argv, 50));
-    Camera.set(CAP_PROP_FPS, ("-fps", argc, argv, 100));
+    Camera.set(CAP_PROP_FPS, ("-fps", argc, argv, 0));
 }
 
 void Capture()
@@ -51,21 +51,21 @@ void Perspective()
     line(frame, Source[3], Source[2], Scalar(0, 0, 255), 2);
     line(frame, Source[2], Source[0], Scalar(0, 0, 255), 2);
 
-    line(frame, Destination[0], Destination[1], Scalar(0, 255, 0), 2);
-    line(frame, Destination[1], Destination[3], Scalar(0, 255, 0), 2);
-    line(frame, Destination[3], Destination[2], Scalar(0, 255, 0), 2);
-    line(frame, Destination[2], Destination[0], Scalar(0, 255, 0), 2);
+   // line(frame, Destination[0], Destination[1], Scalar(0, 255, 0), 2);
+    //line(frame, Destination[1], Destination[3], Scalar(0, 255, 0), 2);
+    //line(frame, Destination[3], Destination[2], Scalar(0, 255, 0), 2);
+   // line(frame, Destination[2], Destination[0], Scalar(0, 255, 0), 2);
 
     Matrix = getPerspectiveTransform(Source, Destination);
-    warpPerspective(frame, framePers, Matrix, Size(400, 240));
+    warpPerspective(frame, framePers, Matrix, Size(300, 200));
 }
 
 void Threshold()
 {
     cvtColor(framePers, frameGray, COLOR_RGB2GRAY);
-    inRange(frameGray, 100, 110, frameThresh);
+    inRange(frameGray, 195, 255, frameThresh);
     // input image, minm thresold white, maxm thresold for white , output image
-    Canny(frameGray, frameEdge, 900, 900, 3, false);
+    Canny(frameGray, frameEdge, 300, 500, 3, false);
     add(frameThresh, frameEdge, frameFinal);
 }
 

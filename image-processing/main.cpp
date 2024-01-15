@@ -20,16 +20,17 @@ stringstream ss;
 vector<int> histrogramLane;
 vector<int> histrogramLaneEnd;
 
-Point2f Source[] = {Point2f(40, 135), Point2f(360, 135), Point2f(0, 185), Point2f(400, 185)};
-Point2f Destination[] = {Point2f(100, 0), Point2f(280, 0), Point2f(100, 240), Point2f(280, 240)};
+// data type of points in px values
+Point2f Source[] = {Point2f(50, 135), Point2f(253, 135), Point2f(10, 185), Point2f(291, 185)};
+Point2f Destination[] = {Point2f(75,0), Point2f(230, 0), Point2f(75,240), Point2f(230, 240)};
 
 void Setup(int argc, char **argv, RaspiCam_Cv &Camera)
 {
-    Camera.set(CAP_PROP_FRAME_WIDTH, ("-w", argc, argv, 400));
-    Camera.set(CAP_PROP_FRAME_HEIGHT, ("-h", argc, argv, 240));
+    Camera.set(CAP_PROP_FRAME_WIDTH, ("-w", argc, argv,300));
+    Camera.set(CAP_PROP_FRAME_HEIGHT, ("-h", argc, argv, 200));
     Camera.set(CAP_PROP_BRIGHTNESS, ("-br", argc, argv, 50));
     Camera.set(CAP_PROP_CONTRAST, ("-co", argc, argv, 50));
-    Camera.set(CAP_PROP_SATURATION, ("-sa", argc, argv, 50));
+    Camera.set(CAP_PROP_SATURATION, ("-sa", argc, argv, 60));
     Camera.set(CAP_PROP_GAIN, ("-g", argc, argv, 50));
     Camera.set(CAP_PROP_FPS, ("-fps", argc, argv, 0));
 }
@@ -49,14 +50,15 @@ void Perspective()
     line(frame, Source[2], Source[0], Scalar(0, 0, 255), 2);
 
     Matrix = getPerspectiveTransform(Source, Destination);
-    warpPerspective(frame, framePers, Matrix, Size(400, 240));
+    warpPerspective(frame, framePers, Matrix, Size(300, 200));
 }
 
 void Threshold()
 {
     cvtColor(framePers, frameGray, COLOR_RGB2GRAY);
-    inRange(frameGray, 230, 255, frameThresh);
-    Canny(frameGray, frameEdge, 900, 900, 3, false);
+    inRange(frameGray, 195, 255, frameThresh);
+    // input image, minm thresold white, maxm thresold for white , output image
+    Canny(frameGray, frameEdge, 300, 500, 3, false);
     add(frameThresh, frameEdge, frameFinal);
     cvtColor(frameFinal, frameFinal, COLOR_GRAY2RGB);
     cvtColor(frameFinal, frameFinalDuplicate, COLOR_RGB2BGR);  // used in histrogram function only
@@ -65,21 +67,21 @@ void Threshold()
 
 void Histrogram()
 {
-    histrogramLane.resize(400);
+    histrogramLane.resize(300);
     histrogramLane.clear();
 
-    for (int i = 0; i < 400; i++) // frame.size().width = 400
+    for (int i = 0; i < 300; i++) // frame.size().width = 300
     {
         ROILane = frameFinalDuplicate(Rect(i, 140, 1, 100));
         divide(255, ROILane, ROILane);
         histrogramLane.push_back((int)(sum(ROILane)[0]));
     }
 
-    histrogramLaneEnd.resize(400);
+    histrogramLaneEnd.resize(300);
     histrogramLaneEnd.clear();
-    for (int i = 0; i < 400; i++)
+    for (int i = 0; i < 300; i++)
     {
-        ROILaneEnd = frameFinalDuplicate1(Rect(i, 0, 1, 240));
+        ROILaneEnd = frameFinalDuplicate1(Rect(i, 0, 1, 200));
         divide(255, ROILaneEnd, ROILaneEnd);
         histrogramLaneEnd.push_back((int)(sum(ROILaneEnd)[0]));
     }
@@ -94,20 +96,20 @@ void LaneFinder()
     LeftLanePos = distance(histrogramLane.begin(), LeftPtr);
 
     vector<int>::iterator RightPtr;
-    RightPtr = max_element(histrogramLane.begin() + 250, histrogramLane.end());
+    RightPtr = max_element(histrogramLane.begin() + 200, histrogramLane.end());
     RightLanePos = distance(histrogramLane.begin(), RightPtr);
 
-    line(frameFinal, Point2f(LeftLanePos, 0), Point2f(LeftLanePos, 240), Scalar(0, 255, 0), 2);
-    line(frameFinal, Point2f(RightLanePos, 0), Point2f(RightLanePos, 240), Scalar(0, 255, 0), 2);
+    line(frameFinal, Point2f(LeftLanePos, 0), Point2f(LeftLanePos, 200), Scalar(0, 255, 0), 2);
+    line(frameFinal, Point2f(RightLanePos, 0), Point2f(RightLanePos, 200), Scalar(0, 255, 0), 2);
 }
 
 void LaneCenter()
 {
     laneCenter = (RightLanePos - LeftLanePos) / 2 + LeftLanePos;
-    frameCenter = 188;
+    frameCenter = 150;
 
-    line(frameFinal, Point2f(laneCenter, 0), Point2f(laneCenter, 240), Scalar(0, 255, 0), 3);
-    line(frameFinal, Point2f(frameCenter, 0), Point2f(frameCenter, 240), Scalar(255, 0, 0), 3);
+    line(frameFinal, Point2f(laneCenter, 0), Point2f(laneCenter, 200), Scalar(0, 255, 0), 3);
+    line(frameFinal, Point2f(frameCenter, 0), Point2f(frameCenter, 200), Scalar(255, 0, 0), 3);
 
     Result = laneCenter - frameCenter;
 }
